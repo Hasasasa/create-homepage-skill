@@ -1,9 +1,9 @@
 ---
-name: homepage-claudeCreate
+name: create-homepage-skill
 description: Build or redesign a distinctive, animation-rich personal homepage / portfolio (个人主页 / 作品集) — for a real person, from their brief through a runnable base, reference-driven iteration, headless verification, and public deployment. Use when someone wants a memorable, lively personal site with scroll-driven storytelling and micro-interactions, NOT a generic template. Ships a concrete motion "connective layer" (design tokens + portable animation primitives + a reduced-motion/performance contract) so the result is never empty or 单板; the bespoke world (metaphor, structure, visual language) grows from that person's own materials and references. Locks a proven React + Vite + framer-motion + Canvas + lazy three.js stack.
 ---
 
-# homepage-claudeCreate
+# Create Homepage Skill
 
 把**一个真实的人**做成一个**有世界观、会呼吸、能上线**的个人主页。
 
