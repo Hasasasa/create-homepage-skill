@@ -19,6 +19,7 @@
 
 - **React + Vite**——新项目采用当前稳定且相互兼容的版本；改造项目沿用现有主版本，除非用户明确授权升级。
 - **React 动效库**——优先沿用项目已有方案；新引入时按当前官方包名和入口使用。若所选版本支持 `LazyMotion` 一类按需能力，则启用轻量加载。具体动效契约见 `motion-kit.md`。
+- **GSAP + ScrollTrigger —— 按需选，不与上一条互斥**：需要**时间线编排的开场序列**（遮罩揭开 / 位移 / 压缩归位）或**滚动驱动的 pin / scrub / reveal / parallax**（高端作品集、创意机构官网那一类）时，用 GSAP + ScrollTrigger 通常比声明式动效库顺手；组件级入场、手势、布局动画仍用 Motion，两者可共存。契约照样落：`prefers-reduced-motion` 下不注册 ScrollTrigger（或 `.kill()`）、组件卸载时 `ctx.revert()` / kill 掉 trigger、字体与图片加载完成后 `ScrollTrigger.refresh()` 校正触发点。按需引入，别塞进首屏关键 bundle。
 - **Canvas 2D**——环境背景层、点阵/粒子类效果（视觉从库现取，套 `motion-kit.md` 的 `AmbientCanvas` 性能契约包装）。
 - **three.js —— 仅当需要 3D 时**才引，且**动态 import + 只在用到的那个组件里**（真实项目里只有开屏地球用它，主站不含），失败要有降级回退。绝不进主 bundle。
 - **生成式 WebGL 组件 —— 按需**：确有背景/封面需求时，按当时官方文档核对包名、导出 API、框架兼容性和许可证后再安装；懒加载并控制弱机开销，不把历史包名写成永久指令。
@@ -83,7 +84,10 @@
 - React 路径：沿用项目已有动效方案；新增依赖时按所选版本的官方入口和按需加载方式实现，不把某个历史包名或 API 当作永久契约。
 - 使用 Canvas/WebGL 时：DPR 上限（Canvas `≤2`、WebGL `≤1.75`）；密度按视口面积算、触屏减半；元素滚出视口用 `IntersectionObserver` 暂停，标签页/文档切后台用 `visibilitychange` 暂停 rAF。固定全屏背景不会因页面滚动离屏，但仍要处理后台暂停。
 - 使用 three.js / paper-shaders 时：动态 import + 懒加载，不进主 bundle。
+- **视频背景 Hero**（设计师作品集常见）：`muted playsinline autoplay`（否则移动端不自动播）+ `poster` 首帧图防白屏；控制体积（压缩、合适编码，必要时按连接/视口懒加载）；移动端或弱网降级为静帧/首帧图，别硬灌大视频；`prefers-reduced-motion` 下暂停并显示 poster。
+- **滚动监听**：别裸挂高频 `scroll` 事件做布局计算；用 `IntersectionObserver`、rAF 节流或 ScrollTrigger 自带调度，避免每帧强制 reflow。
 - 图片：别把用不到的塞进 `public`（每次构建都打包）；大图压缩。
+- **首屏加载（LCP）**：盯首屏关键资源体积——视频/大图/字体是常见拖累；首屏主图/视频优先加载、非关键资源懒加载，并核对生产构建的首屏 JS 体积与关键渲染路径。
 - 跑所选技术路径或现有项目实际提供的构建/校验命令，并检查产物体积；React/Vite 路径通常是 `npm run build`，纯静态无构建项目则验证本地服务或直接产物，不凭空添加 npm 工具链。
 
 ## 上线就绪（SEO / 社交分享 / favicon）

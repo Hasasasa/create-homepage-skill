@@ -14,6 +14,8 @@
 
 ## 1. Motion for React 规范
 
+> **动效引擎按需选，别默认只有 Motion 一种。** 组件级入场 / 手势 / 布局动画用 Motion（本节及第 3 节示例）；**时间线编排的开场序列、滚动 pin / scrub / parallax（高端作品集、创意机构官网那一类）用 GSAP + ScrollTrigger 更顺手**，两者可共存。GSAP 路径同样过连接层：token 统一、reduced-motion 下不注册 ScrollTrigger（第 5 节）、组件卸载 `ctx.revert()` 清理、字体/图片加载完成后 `ScrollTrigger.refresh()`。引擎选择与按需引入见 `build-verify-deploy.md`「React 强交互路径」。
+
 - 沿用项目已经安装的 `motion` 或 `framer-motion` 及其导入路径，不为统一示例迁移依赖；先核对当前版本是否支持下列 API。
 - 支持时用 `LazyMotion + domAnimation`，在该 Provider 内统一用 `m.*`。不要写死体积收益；用项目的生产构建和 bundle analyzer 实测。
 - 在应用根部包一层 `MotionProvider`。
@@ -306,7 +308,7 @@ export default function AmbientCanvas() {
 | 层 | 判定 | 行为 |
 |---|---|---|
 | **CSS（共同底线）** | `no-preference` 渐进增强 + `reduce` 兜底 | 基础状态保持内容可见；关闭动画后仍显式恢复最终状态（第 4 节） |
-| **JS（Motion）** | 当前 Motion 包提供的 reduced-motion API | 组件返回**静态元素**（Reveal/SplitText 已内建；从库取的交互也要补） |
+| **JS 动效引擎（Motion / GSAP 等）** | Motion 的 reduced-motion API；GSAP 用 `matchMedia` 判定 | Motion 组件返回**静态元素**（Reveal/SplitText 已内建）；GSAP 时间线不 play、ScrollTrigger 不注册（或 `.kill()`），直接渲染终态；从库取的交互也要补 |
 | **Canvas / WebGL** | `matchMedia(...).matches` + `change` 监听 | **停止渲染** / 快照静帧；偏好在页面打开期间变化也立即响应 |
 
 从外部库（reactbits / paper）取来的组件通常没有完整的 reduced-motion 处理——移植时检查它用了哪些层，并逐层补齐。这是它们“直接能用”但不能原样上线的关键差别。
