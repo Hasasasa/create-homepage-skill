@@ -36,9 +36,13 @@ export const color = {
   line: 'rgba(255,255,255,0.08)',
 }
 export const type = {
-  display: `'Space Grotesk', system-ui, sans-serif`,  // ← 别默认它，见铁律 9
-  body: `'Inter', system-ui, sans-serif`,
-  mono: `ui-monospace, 'Cascadia Code', monospace`,
+  // 任何非系统通用字体都必须 @font-face 自托管 woff2（见 2a「字体自托管」）；
+  // fallback 里带一款 CJK 字体，避免中文回退本机黑体后度量错乱、行高崩坏。
+  display: `'YourDisplay', 'Noto Sans SC', system-ui, sans-serif`,  // ← 别默认 Space Grotesk，见铁律 9
+  body:    `'YourBody', 'Noto Sans SC', system-ui, sans-serif`,
+  mono:    `'YourMono', ui-monospace, monospace`,
+  // 压缩体/紧排的拉丁标题另设一档，别拿它排中文（会叠字，见 2a）：
+  displayLatin: `'YourCondensed', system-ui, sans-serif`,
 }
 export const layout = { maxw: '1700px', pad: '80px', ease: 'cubic-bezier(0.22, 1, 0.36, 1)' }
 
@@ -54,6 +58,26 @@ export const spring = {
 > 这四组数值是**起点手感，不是固定签名**。按每个人的 Q7（张扬/克制、快/慢）retune——同一套原语换掉 spring 数值，手感就完全不同，这也是避免"每版手感都一样"的一环。
 
 > 提醒：`Space Grotesk` / `Inter` 是 AI 通病"安全牌"字体（铁律 9）。除非用户明确要，否则换成更贴这个人气质的字体。
+
+### 2a. 中文排版护栏 + 字体自托管（硬规则）
+
+产出几乎都是中文站，但压缩体大标题那套手感参数是给拉丁字母调的，直接套到中文全角字会**叠字/碰撞**（真实产出里 hero 标题「信号/噪声」糊成一团、摄影师多行标题上下压字，都是这么来的）。两条硬底线：
+
+**① 中文排版护栏**
+- 多行中文大标题：`line-height ≥ 1.05`、`letter-spacing ≈ 0`（最多 `-0.01em`）。**禁用**为 Latin 调的 `line-height: .7~.95` / `letter-spacing: -.06~-.09em`——那是叠字根源。
+- `text-transform: uppercase` 对中文**无效**，别指望它出效果；只有确实是拉丁字母的 eyebrow/标题才用。
+- 想要"压缩体/紧排"的工程感时，拉丁标题走 `type.displayLatin` 那一档，中文标题走 `type.display`，**分开设**。
+- **桌面和移动断点都要覆盖**——叠字常常只在某一个断点漏改（真实产出里就有移动端标题忘了抬行高而叠字）。
+
+**② 字体自托管（强制）**
+`type` 里任何非系统通用字体，必须 `@font-face` 自托管 woff2 子集，**别裸依赖本机字体**：
+- `Arial Narrow / Bahnschrift / Aptos Narrow / Cascadia Mono` 等**只有 Windows 有**，在 mac/iOS/Linux/Android 直接回退——压缩体美学全丢，中文还会触发上面的叠字。
+- display / mono 各内嵌一款开源字体（如 `Saira`·`Archivo Condensed`、`JetBrains Mono`），中文用 `Noto Sans/Serif SC` 子集。
+  ```css
+  @font-face{ font-family:'YourDisplay'; src:url('/fonts/your-display.woff2') format('woff2');
+    font-weight:400 800; font-display:swap; }
+  ```
+- **别被作者本机骗了**：截图机器上恰好装了这些字，问题不显形——见 `build-verify-deploy.md` 无头验证的「中文不叠字 / 字体不靠本机」两条断言。
 
 ---
 

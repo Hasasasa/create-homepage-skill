@@ -28,6 +28,8 @@
 2. **0 控制台报错**（监听 `console`/`pageerror`）。
 3. 逐屏截图肉眼过一遍：有没有错位、盖住、糊图、留白撑开。
 4. **上线就绪存在性检查**：`<title>`、`meta[property="og:image"]`、favicon 链接都在。
+5. **中文大标题不叠字**：放大看多行中文大标题有没有上下压字/碰撞（1440 与 390 都看）。根因多是行高 `<1` 或负字距套到了 CJK，见 `motion-kit.md` 第 2a 节。
+6. **字体不靠本机**：`theme.js` 用到的非系统字体必须 `@font-face` 自托管——作者本机常已装 `Arial Narrow / Bahnschrift / Cascadia` 等同名字体，问题不显形。确认页面 `@font-face` 真的生效（DevTools 里字体来源是站内 woff2，不是本地），或在无该字体的环境再截一次核验。
 
 靠真实渲染判断，不靠回读源码。验证完把脚本和 `puppeteer-core` 依赖清理掉。
 
